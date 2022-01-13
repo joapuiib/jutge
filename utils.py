@@ -47,8 +47,12 @@ def load_file(path):
         exit(1)
 
 
-def highlight(text, syntax):
-    return highlight_py(text, get_lexer_by_name(syntax), Terminal256Formatter(style="monokai"))
+def highlight(text, syntax, light=False):
+    theme = "monokai"
+    if light:
+        theme = "solarized-light"
+
+    return highlight_py(text, get_lexer_by_name(syntax), Terminal256Formatter(style=theme))
 
 
 def line_number_print(text):

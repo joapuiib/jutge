@@ -160,6 +160,7 @@ if __name__ == '__main__':
     parser.add_argument("-v", "--volume", action="append", default=[])
     parser.add_argument("--copy", action="store_true", default=False)
     parser.add_argument("--save", nargs="?", default=False)
+    parser.add_argument("--light", action="store_true", default=False)
     args = parser.parse_args()
 
     grade = Grade(args)

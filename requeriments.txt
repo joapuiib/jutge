@@ -1,3 +1,5 @@
-pygments
 ansiwrap
+pygments
+GitPython
+pyperclip
 colorama

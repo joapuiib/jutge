@@ -33,6 +33,8 @@ class SQLJudge(BaseJudge):
         self.result = {}
         self.result["exercises"] = []
 
+        self.light = args.light
+
         self.load_info_from_folder()
 
 
@@ -137,7 +139,7 @@ class SQLJudge(BaseJudge):
                    f" mysql -B -u{self.user} -p{self.password} {args}"
         )
         # print(query)
-        return run_process(command, stdin=query)
+        return run_process(command, stdin=query, timeout=10)
 
 
     def run_interactive(self):
@@ -204,6 +206,11 @@ class SQLJudge(BaseJudge):
             result_query = self.run_query(source, force=force)
             output = result_query.stdout.strip()
             stderr = re.sub(r" at line \d+", "", result_query.stderr.strip())
+        except TimeoutError:
+            status = Status.TIMEOUT
+            print(f"  - status: {status}")
+            result_test["status"] = status.name
+            return result_exercise
         except ExitCodeError as e:
             stderr = re.sub(r" at line \d+", "", e.stderr).strip()
             if not expected_stderr:
@@ -342,7 +349,7 @@ class SQLJudge(BaseJudge):
 
 
     def print_source(self, source_content):
-        utils.line_number_print(utils.highlight(source_content, "sql").strip())
+        utils.line_number_print(utils.highlight(source_content, "sql", self.light).strip())
 
 def prettify_sql_output(text, headers=True):
     table = []
