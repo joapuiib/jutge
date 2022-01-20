@@ -29,6 +29,7 @@ $ grade_repo.py testcase_file.yml directory/
 ## TODO
 - Installation and usage
 - Testcase files documentation
+- YAML validators for each judge
 ### SQL Judge
 - Normalize output new line endings
 - Test and fix Timeout
