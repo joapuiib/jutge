@@ -1,14 +1,14 @@
 from glob import glob
 import os
-from process import run_process, run_process_interactive, TimeoutError, ExitCodeError
-import utils
 import re
 from colorama import Fore
-from .base_judge import BaseJudge
 import time
 import sys
 import traceback
-from status import Status
+from .base_judge import BaseJudge
+from ..status import Status
+from ..process import run_process, run_process_interactive, TimeoutError, ExitCodeError
+from .. import utils
 
 class SQLJudge(BaseJudge):
     def __init__(self, base_dir, tests, args):

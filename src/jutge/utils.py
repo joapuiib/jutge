@@ -8,9 +8,9 @@ from colorama import Fore
 import itertools
 from ansiwrap import wrap
 import re
-from status import Status
 import pyperclip
 from pprint import pprint
+from .status import Status
 
 def run_or_exit(func, *args, out=None, err=None, err_func=None, err_args=[], err_kwargs={}, **kwargs):
     if out:

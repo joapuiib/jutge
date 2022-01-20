@@ -1,9 +1,9 @@
 from glob import glob
 import os
-from process import run_process, run_process_interactive, TimeoutError, ExitCodeError
-import utils
 import re
 from colorama import Fore
+from ..process import run_process, run_process_interactive, TimeoutError, ExitCodeError
+from .. import utils
 from .base_judge import BaseJudge
 
 class JavaJudge(BaseJudge):

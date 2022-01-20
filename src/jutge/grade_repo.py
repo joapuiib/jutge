@@ -6,10 +6,10 @@ from colorama import Fore
 from datetime import datetime
 import sys
 import git
-from judge.java_judge import JavaJudge
-from judge.sql_judge import SQLJudge
-from utils import run_or_exit, prettify_dict, load_file, copy_clipboard
-import utils
+from jutge.judges.java_judge import JavaJudge
+from jutge.judges.sql_judge import SQLJudge
+from jutge.utils import run_or_exit, prettify_dict, load_file, copy_clipboard
+import jutge.utils as utils
 
 def loadYAML(filename):
     with open(filename, 'r') as stream:
@@ -149,7 +149,7 @@ class Grade:
             run_or_exit(repo.git.checkout, "master" , out=f"Checkout master branch on exit...", err=f"Error checkout master")
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("test_cases")
     parser.add_argument("dir", nargs="*")
@@ -166,3 +166,6 @@ if __name__ == '__main__':
     grade = Grade(args)
     for repo_dir in args.dir:
         grade.grade(repo_dir)
+
+if __name__ == '__main__':
+    main()
