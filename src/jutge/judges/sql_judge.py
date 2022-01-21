@@ -124,13 +124,13 @@ class SQLJudge(BaseJudge):
 
     def run_init_scripts(self):
         for init_script in self.init_scripts:
-            self.run_query(init_script)
+            self.run_query(init_script, timeout=10)
     def run_post_scripts(self):
         for post_script in self.post_scripts:
-            self.run_query(post_script)
+            self.run_query(post_script, timeout=10)
 
 
-    def run_query(self, query, force=False):
+    def run_query(self, query, force=False, timeout=2):
         args = "-t --default-character-set=utf8"
         if force:
             args += " -f"
@@ -139,7 +139,7 @@ class SQLJudge(BaseJudge):
                    f" mysql -B -u{self.user} -p{self.password} {args}"
         )
         # print(query)
-        return run_process(command, stdin=query, timeout=10)
+        return run_process(command, stdin=query, timeout=timeout)
 
 
     def run_interactive(self):
@@ -202,6 +202,12 @@ class SQLJudge(BaseJudge):
         stderr = ""
         status = Status.PERFECT
 
+        if not source.strip():
+            status = Status.EMPTY
+            print(f"  - status: {status}")
+            result_exercise["status"] = status.name
+            return result_exercise
+
         try:
             result_query = self.run_query(source, force=force)
             output = result_query.stdout.strip()
@@ -209,7 +215,7 @@ class SQLJudge(BaseJudge):
         except TimeoutError:
             status = Status.TIMEOUT
             print(f"  - status: {status}")
-            result_test["status"] = status.name
+            result_exercise["status"] = status.name
             return result_exercise
         except ExitCodeError as e:
             stderr = re.sub(r" at line \d+", "", e.stderr).strip()

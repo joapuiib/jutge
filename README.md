@@ -32,5 +32,4 @@ $ grade_repo.py testcase_file.yml directory/
 - YAML validators for each judge
 ### SQL Judge
 - Normalize output new line endings
-- Test and fix Timeout
 - run\_object instead of run\_exercise and run\_test
