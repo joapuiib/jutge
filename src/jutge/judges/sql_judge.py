@@ -64,8 +64,8 @@ class SQLJudge(BaseJudge):
                 err=f"Error running init scripts")
 
             # print(f"Interactive: {interactive}")
-            for exercise in self.exercises:
-                result_exercise = self.judge_exercise(exercise, interactive)
+            for name, exercise in self.exercises.items():
+                result_exercise = self.judge_exercise(name, exercise, interactive)
                 self.result["exercises"].append(result_exercise)
 
             utils.run_or_exit(self.run_post_scripts,
@@ -150,8 +150,7 @@ class SQLJudge(BaseJudge):
 
 
     @stop_database
-    def judge_exercise(self, exercise, interactive):
-        name = exercise.get("name")
+    def judge_exercise(self, name, exercise, interactive):
         if not name:
             print(f"{Fore.RED}Error! No s'ha especificat la clau \"name\" en algun exercici.{Fore.RESET}")
             raise Exception("No class name specified")
@@ -253,8 +252,8 @@ class SQLJudge(BaseJudge):
         tests = exercise.get("tests", None)
         if tests:
             result_exercise["tests"] = []
-            for test in tests:
-                result_test, test_status = self.run_test(test)
+            for name, test in tests.items():
+                result_test, test_status = self.run_test(name, test)
                 result_exercise["tests"].append(result_test)
                 status = status.merge(test_status)
 
@@ -275,9 +274,8 @@ class SQLJudge(BaseJudge):
         return result_exercise
 
 
-    def run_test(self, test):
+    def run_test(self, name, test):
         result_test = {}
-        name = test["name"]
         test_input = test["input"]
         force = test.get("force", False)
         post = test.get("post", [])
