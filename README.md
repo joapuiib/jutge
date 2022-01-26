@@ -30,6 +30,7 @@ $ grade_repo.py testcase_file.yml directory/
 - Installation and usage
 - Testcase files documentation
 - YAML validators for each judge
+- Jutge version requeriment in tests file
 ### SQL Judge
 - Normalize output new line endings
 - run\_object instead of run\_exercise and run\_test
