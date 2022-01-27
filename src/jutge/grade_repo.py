@@ -108,7 +108,7 @@ class Grade:
             limit_date = datetime.fromisoformat(limit_date)
             if tag_date > limit_date:
                 print(Fore.RED + "COMPTE!! El tag ha segut modificat després de la data d'entrega" + Fore.RESET)
-                result.setdefault("errors", []).append("El tag ha segut modificat després de la data d'entrega")
+                self.result.setdefault("errors", []).append("El tag ha segut modificat després de la data d'entrega")
 
         return repo
 
