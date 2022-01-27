@@ -65,6 +65,8 @@ class SQLJudge(BaseJudge):
 
             # print(f"Interactive: {interactive}")
             for name, exercise in self.exercises.items():
+                if not exercise:
+                    exercise = {}
                 result_exercise = self.judge_exercise(name, exercise, interactive)
                 self.result["exercises"].append(result_exercise)
 
@@ -183,15 +185,14 @@ class SQLJudge(BaseJudge):
             source = f.read()
             result_exercise["source"] = source
             self.print_source(source)
-            result = self.run_exercise(exercise, source, interactive)
+            result = self.run_exercise(name, exercise, source, interactive)
             result_exercise = {**result_exercise, **result}
         print()
         return result_exercise
 
 
-    def run_exercise(self, exercise, source, interactive):
+    def run_exercise(self, name, exercise, source, interactive):
         result_exercise = {}
-        name = exercise.get("name")
         expected_output = exercise.get("output", "").strip()
         expected_stderr = exercise.get("stderr", "").strip()
         force = exercise.get("force", False)
@@ -253,6 +254,8 @@ class SQLJudge(BaseJudge):
         if tests:
             result_exercise["tests"] = []
             for name, test in tests.items():
+                if not test:
+                    test = {}
                 result_test, test_status = self.run_test(name, test)
                 result_exercise["tests"].append(result_test)
                 status = status.merge(test_status)
