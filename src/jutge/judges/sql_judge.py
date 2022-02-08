@@ -30,7 +30,12 @@ class SQLJudge(BaseJudge):
         self.password = "1234"
 
         self.init_scripts = tests.get("init", [])
+        if not isinstance(self.init_scripts, list):
+            self.init_scripts = [self.init_scripts]
+
         self.post_scripts = tests.get("post", [])
+        if not isinstance(self.post_scripts, list):
+            self.post_scripts = [self.post_scripts]
 
         self.result = {}
         self.result["exercises"] = []
@@ -104,7 +109,7 @@ class SQLJudge(BaseJudge):
     def run_post_scripts(self):
         self.run_queries(self.post_scripts)
 
-    def run_queries(self, queries, error_msg="Error running queries:", timeout=5):
+    def run_queries(self, queries, error_msg="Error running queries:", timeout=10):
         for query in queries:
             try:
                 self.run_query(query, timeout)
@@ -228,7 +233,7 @@ class SQLJudge(BaseJudge):
         self.run_queries(_object.init, timeout=10, error_msg=f"Error running init scripts in {_object.name}")
 
         try:
-            result_query = self.run_query(_object.source, force=_object.force)
+            result_query = self.run_query(_object.source, force=_object.force, timeout=10)
             _object.output = result_query.stdout.strip()
             _object.stderr = re.sub(r" at line \d+", "", result_query.stderr.strip())
         except TimeoutError:
