@@ -10,6 +10,7 @@ from ..status import Status
 from ..process import run_process, run_process_interactive, TimeoutError, ExitCodeError
 from .. import utils
 from ..models.exercise import Exercise
+from pprint import pprint
 
 class SQLJudge(BaseJudge):
     def __init__(self, base_dir, tests, args):
@@ -142,6 +143,7 @@ class SQLJudge(BaseJudge):
             # print(f"Interactive: {interactive}")
             for exercise in self.exercises:
                 self.judge_exercise(exercise, interactive)
+                self.result["exercises"].append(exercise.get_result())
 
             utils.run_or_exit(self.run_post_scripts,
                 out=f"Running post scirpts...",
