@@ -13,20 +13,21 @@ class UnitTest:
         self.force = _dict.get("force", False)
 
         self.output = ""
+        self.stderr = ""
         self.colored_output = None
         self.colored_expected_output = None
 
         self.init = _dict.get("init", [])
         if not isinstance(self.init, list):
-            self.init = [init]
+            self.init = [self.init]
 
         self.post = _dict.get("post", [])
         if not isinstance(self.post, list):
-            self.post = [post]
+            self.post = [self.post]
 
         self.clean = _dict.get("clean", [])
         if not isinstance(self.clean, list):
-            self.clean = [clean]
+            self.clean = [self.clean]
 
         self.tests = []
         for test_name, test in _dict.get("tests", {}).items():

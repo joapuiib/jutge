@@ -46,6 +46,9 @@ class Grade:
                         return tests
                 else:
                     tests[k] = self.find_and_load_yaml_files(v, tests_dir)
+        elif isinstance(tests, str):
+            return tests.strip()
+
         return tests
 
 

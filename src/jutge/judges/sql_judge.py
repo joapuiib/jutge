@@ -103,7 +103,7 @@ class SQLJudge(BaseJudge):
     def run_post_scripts(self):
         self.run_queries(self.post_scripts)
 
-    def run_queries(self, queries, error_msg="Error running queries:", timeout=2):
+    def run_queries(self, queries, error_msg="Error running queries:", timeout=5):
         for query in queries:
             try:
                 self.run_query(query, timeout)
@@ -192,6 +192,10 @@ class SQLJudge(BaseJudge):
         _object.set_status(Status.PERFECT)
         self.execute_object(_object, indent=indent)
         if _object.status != Status.PERFECT:
+            if isinstance(_object, Exercise):
+                self.print_exercise(_object)
+                utils.print_lines(f"- status: {_object.status}", indent=indent)
+                utils.print_lines(f"{Fore.RED}{_object.stderr}{Fore.RESET}", indent=indent + 2)
             return
 
         self.compare_object(_object)
@@ -232,8 +236,6 @@ class SQLJudge(BaseJudge):
             _object.stderr = re.sub(r" at line \d+", "", e.stderr).strip()
             if not _object.expected_stderr:
                 _object.set_status(Status.RUNTIME)
-                utils.print_lines(f"- status: {_object.status}", indent=indent)
-                utils.print_lines(f"{Fore.RED}{_object.stderr}{Fore.RESET}", indent=indent + 2)
                 _object.result["error"] = _object.stderr
 
         self.run_queries(_object.post, timeout=10, error_msg=f"Error running post scripts in {_object.name}")
@@ -273,7 +275,7 @@ class SQLJudge(BaseJudge):
                 utils.print_lines("- expected stderr:", indent=indent + 1)
                 utils.print_lines(expected_stderr, indent=indent + 3)
             if exercise.stderr:
-                stderr = exercise.colored_output if exercise.colored_output else exercise.stderr
+                stderr = exercise.colored_output if exercise.colored_output else f"{Fore.RED}{exercise.stderr}{Fore.RESET}"
                 utils.print_lines("- stderr:", indent=indent + 1)
                 utils.print_lines(stderr, indent=indent + 3)
 
@@ -283,10 +285,10 @@ class SQLJudge(BaseJudge):
         if unit_test.status != Status.PERFECT:
             if unit_test.input:
                 utils.print_lines("- input:", indent=indent + 1)
-                utils.print_lines(unit_test.input, indent=indent + 3)
+                utils.print_lines(f"{Fore.CYAN}{unit_test.input}{Fore.RESET}", indent=indent + 3)
             elif unit_test.source:
                 utils.print_lines("- source:", indent=indent + 1)
-                utils.print_lines(unit_test.source, indent=indent + 3)
+                utils.print_lines(f"{Fore.CYAN}{unit_test.source}{Fore.RESET}", indent=indent + 3)
 
             self.print_exercise(unit_test, indent=indent)
 
