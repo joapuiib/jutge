@@ -214,11 +214,12 @@ def colored_diff(real, expected, junk=""):
 def unified_diff(real, expected, junk=""):
     return "\n".join(list(difflib_unified_diff(real.splitlines(), expected.splitlines(), fromfile="output", tofile="output", lineterm="")))
 
-def print_lines(text, start="", end=""):
+def print_lines(text, start="", end="", indent=0):
+    indent = "  " * indent
     for line in text.splitlines():
         if line:
             # print(repr(line))
-            print(f"{start}{line}{end}")
+            print(f"{indent}{start}{line}{end}")
 
 def copy_clipboard(content):
     pyperclip.copy(content)
