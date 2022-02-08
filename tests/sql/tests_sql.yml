@@ -1,0 +1,64 @@
+judge: sql
+name: tests_sql
+
+post:
+  - |
+    select group_concat(
+      distinct concat('drop database ', table_schema, ';')
+      separator ''
+    )
+    from information_schema.tables
+    where table_schema not in ('mysql', 'information_schema', 'sys', 'performance_schema');
+
+exercises:
+  create_schema:
+    clean:
+      - delete from store.cashiers where id < 0;
+      - delete from store.products where id < 0;
+    tests:
+      perfect:
+        source: |
+          select table_name, column_name, column_type, column_default, is_nullable, extra
+          from information_schema.columns
+          where table_name = 'product' and table_schema = 'test_sql'
+          order by table_name, column_name;
+        output: |
+          +------------+-------------+--------------+----------------+-------------+----------------+
+          | table_name | column_name | column_type  | column_default | is_nullable | extra          |
+          +------------+-------------+--------------+----------------+-------------+----------------+
+          | product    | description | varchar(200) | NULL           | YES         |                |
+          | product    | id          | int(11)      | NULL           | NO          | auto_increment |
+          | product    | name        | varchar(50)  | NULL           | NO          |                |
+          | product    | price       | float        | NULL           | NO          |                |
+          +------------+-------------+--------------+----------------+-------------+----------------+
+
+      failed:
+        source: |
+          select table_name, column_name, column_type, column_default, is_nullable, extra
+          from information_schema.columns
+          where table_name = 'order' and table_schema = 'test_sql'
+          order by table_name, column_name;
+        output: |
+          +------------+-------------+-------------+----------------+-------------+----------------+
+          | table_name | column_name | column_type | column_default | is_nullable | extra          |
+          +------------+-------------+-------------+----------------+-------------+----------------+
+          | order      | email       | varchar(10) | NULL           | NO          |                |
+          | order      | id          | int(11)     | NULL           | NO          | auto_increment |
+          | order      | product     | int(11)     | NULL           | NO          |                |
+          +------------+-------------+-------------+----------------+-------------+----------------+
+
+      test_constraint:
+        source: |
+          insert into test_sql.product(id, name, price, description) values
+            (-1, "name", 1, "");
+      test_constraint_error:
+        source: |
+          insert into test_sql.product(id, name, price, description) values
+            (-1, "name", -1, "");
+        stderr: |
+          ERROR 4025 (23000): CONSTRAINT `product.price` failed for `test_sql`.`product`
+
+  not_found:
+  empty:
+  runtime:
+  timeout:
