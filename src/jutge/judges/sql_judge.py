@@ -10,6 +10,7 @@ from ..status import Status
 from ..process import run_process, run_process_interactive, TimeoutError, ExitCodeError
 from .. import utils
 from ..models.exercise import Exercise
+from pprint import pprint
 
 class SQLJudge(BaseJudge):
     def __init__(self, base_dir, tests, args):
@@ -29,7 +30,12 @@ class SQLJudge(BaseJudge):
         self.password = "1234"
 
         self.init_scripts = tests.get("init", [])
+        if not isinstance(self.init_scripts, list):
+            self.init_scripts = [self.init_scripts]
+
         self.post_scripts = tests.get("post", [])
+        if not isinstance(self.post_scripts, list):
+            self.post_scripts = [self.post_scripts]
 
         self.result = {}
         self.result["exercises"] = []
@@ -103,7 +109,7 @@ class SQLJudge(BaseJudge):
     def run_post_scripts(self):
         self.run_queries(self.post_scripts)
 
-    def run_queries(self, queries, error_msg="Error running queries:", timeout=2):
+    def run_queries(self, queries, error_msg="Error running queries:", timeout=10):
         for query in queries:
             try:
                 result = self.run_query(query, timeout=timeout)
@@ -142,6 +148,7 @@ class SQLJudge(BaseJudge):
             # print(f"Interactive: {interactive}")
             for exercise in self.exercises:
                 self.judge_exercise(exercise, interactive)
+                self.result["exercises"].append(exercise.get_result())
 
             utils.run_or_exit(self.run_post_scripts,
                 out=f"Running post scirpts...",
@@ -221,7 +228,7 @@ class SQLJudge(BaseJudge):
         self.run_queries(_object.init, timeout=10, error_msg=f"Error running init scripts in {_object.name}")
 
         try:
-            result_query = self.run_query(_object.source, force=_object.force)
+            result_query = self.run_query(_object.source, force=_object.force, timeout=10)
             _object.output = result_query.stdout.strip()
             _object.stderr = re.sub(r" at line \d+", "", result_query.stderr.strip())
         except TimeoutError:
@@ -270,7 +277,7 @@ class SQLJudge(BaseJudge):
                 utils.print_lines("- expected stderr:", indent=indent + 1)
                 utils.print_lines(expected_stderr, indent=indent + 3)
             if exercise.stderr:
-                stderr = exercise.colored_output if exercise.colored_output else exercise.stderr
+                stderr = exercise.colored_output if exercise.colored_output else f"{Fore.RED}{exercise.stderr}{Fore.RESET}"
                 utils.print_lines("- stderr:", indent=indent + 1)
                 utils.print_lines(stderr, indent=indent + 3)
 
@@ -280,10 +287,10 @@ class SQLJudge(BaseJudge):
         if unit_test.status != Status.PERFECT:
             if unit_test.input:
                 utils.print_lines("- input:", indent=indent + 1)
-                utils.print_lines(unit_test.input, indent=indent + 3)
+                utils.print_lines(f"{Fore.CYAN}{unit_test.input}{Fore.RESET}", indent=indent + 3)
             elif unit_test.source:
                 utils.print_lines("- source:", indent=indent + 1)
-                utils.print_lines(unit_test.source, indent=indent + 3)
+                utils.print_lines(f"{Fore.CYAN}{unit_test.source}{Fore.RESET}", indent=indent + 3)
 
             self.print_exercise(unit_test, indent=indent)
 

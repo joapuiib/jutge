@@ -13,6 +13,7 @@ class UnitTest:
         self.force = _dict.get("force", False)
 
         self.output = ""
+        self.stderr = ""
         self.colored_output = None
         self.colored_expected_output = None
 
@@ -39,3 +40,29 @@ class UnitTest:
     def set_output(self, output):
         self.output = output
         self.result["output"] = output
+
+    def get_result(self):
+        self.result["name"] = self.name
+        if self.source:
+            self.result["source"] = self.source
+        if self.input:
+            self.result["input"] = self.input
+
+        output = self.output
+        expected_output = self.expected_output
+
+        if self.expected_stderr:
+            output = self.stderr
+            expected_output = self.expected_stderr
+
+        if expected_output:
+            self.result["expected_output"] = expected_output
+        if output:
+            self.result["output"] = output
+
+        if self.tests:
+            self.result["tests"] = []
+            for unit_test in self.tests:
+                self.result["tests"].append(unit_test.get_result())
+
+        return self.result

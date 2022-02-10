@@ -9,3 +9,5 @@ class Exercise(UnitTest):
 
         self.subpackage = _dict.get("subpackage", "")
 
+    def get_result(self):
+        return super().get_result()
