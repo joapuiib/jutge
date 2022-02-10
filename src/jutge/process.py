@@ -49,7 +49,7 @@ def run_process(command, stdin="", timeout=None):
     if return_code != 0:
         raise ExitCodeError(command, return_code, stderr)
 
-    return SimpleNamespace(stdout = stdout, stderr = stderr)
+    return SimpleNamespace(stdout = stdout, stderr = stderr, return_code = return_code)
 
 def run_process_interactive(command):
     try:
