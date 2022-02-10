@@ -106,8 +106,8 @@ class SQLJudge(BaseJudge):
     def run_queries(self, queries, error_msg="Error running queries:", timeout=2):
         for query in queries:
             try:
-                self.run_query(query, timeout)
-            except Exception as e:
+                result = self.run_query(query, timeout=timeout)
+            except ExitCodeError as e:
                 print(f"  {Fore.RED}{error_msg}{Fore.RESET}")
                 print(f"  {Fore.RED}{e}{Fore.RESET}")
 
@@ -191,20 +191,19 @@ class SQLJudge(BaseJudge):
 
         _object.set_status(Status.PERFECT)
         self.execute_object(_object, indent=indent)
-        if _object.status != Status.PERFECT:
-            return
 
-        self.compare_object(_object)
+        if _object.status == Status.PERFECT:
+            self.compare_object(_object)
 
-        if isinstance(_object, Exercise):
-            self.print_exercise(_object)
+            if isinstance(_object, Exercise):
+                self.print_exercise(_object)
 
-        if _object.tests:
-            for unit_test in _object.tests:
-                self.run_object(unit_test, indent=indent + 1, interactive=False)
-                status = _object.status.merge(unit_test.status)
-                self.print_unit_test(unit_test, indent=indent + 1)
-                _object.set_status(status)
+            if _object.tests:
+                for unit_test in _object.tests:
+                    self.run_object(unit_test, indent=indent + 1, interactive=False)
+                    status = _object.status.merge(unit_test.status)
+                    self.print_unit_test(unit_test, indent=indent + 1)
+                    _object.set_status(status)
 
         if interactive:
             self.run_interactive()
@@ -227,12 +226,10 @@ class SQLJudge(BaseJudge):
             _object.stderr = re.sub(r" at line \d+", "", result_query.stderr.strip())
         except TimeoutError:
             _object.set_status(Status.TIMEOUT)
-            utils.print_lines(f"- status: {_object.status}", indent=indent + 1)
         except ExitCodeError as e:
             _object.stderr = re.sub(r" at line \d+", "", e.stderr).strip()
             if not _object.expected_stderr:
                 _object.set_status(Status.RUNTIME)
-                utils.print_lines(f"- status: {_object.status}", indent=indent)
                 utils.print_lines(f"{Fore.RED}{_object.stderr}{Fore.RESET}", indent=indent + 2)
                 _object.result["error"] = _object.stderr
 
