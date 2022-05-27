@@ -21,7 +21,7 @@ class SQLJudge(BaseJudge):
         self.package = "/".join(self.package.split("."))
 
         # Docker image
-        self.image = "mariadb:latest"
+        self.image = "mariadb:10.8-rc"
 
         # SQL docker container
         self.container = "sql_judge"
