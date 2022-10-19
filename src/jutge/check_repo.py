@@ -3,6 +3,7 @@
 import csv
 import argparse
 import subprocess
+import os
 
 def main():
     parser = argparse.ArgumentParser()
@@ -24,8 +25,12 @@ def main():
         repo = repo.replace("https://gitlab.com/", "git@gitlab.com:")
 
         print(nom, " => ", repo)
+        repo_dir = "/".join([dirname, nom])
         if repo:
-            subprocess.call(["git", "clone", repo, "{}/{}".format(dirname, nom)])
+            if os.path.isdir(repo_dir):
+                subprocess.call(["git", "-C", repo_dir, "pull", "--force", "--tags"])
+            else:
+                subprocess.call(["git", "clone", repo, repo_dir])
 
 if __name__ == "__main__":
     main()

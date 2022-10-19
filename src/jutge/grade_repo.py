@@ -83,8 +83,8 @@ class Grade:
         repo = run_or_exit(self.load_repo, repo_dir)
         origin = repo.remotes.origin
         self.result["repository"] = origin.url
-        run_or_exit(repo.git.checkout, "master" , out=f"Checkout master branch...", err=f"Error checkout master")
         run_or_exit(origin.pull, tags=True, force=True, out=f"Pulling {repo_dir}...", err=f"Error pulling {repo_dir}")
+        run_or_exit(repo.git.checkout, "master" , out=f"Checkout master branch...", err=f"Error checkout master")
 
         # Checkout specific tag
         if tag:
