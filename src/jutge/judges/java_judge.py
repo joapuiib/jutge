@@ -7,7 +7,7 @@ from .. import utils
 from .base_judge import BaseJudge
 
 class JavaJudge(BaseJudge):
-    def __init__(self, base_dir, tests, args, src="src", out="out"):
+    def __init__(self, base_dir, tests, args, src="src/main/java", out="out"):
         super().__init__(base_dir, tests, args)
 
         # Compilation folder (.class)
@@ -27,18 +27,17 @@ class JavaJudge(BaseJudge):
 
         self.load_info_from_folder(f"testcases/java/files")
 
+        self.result = {}
+
 
     def load_info_from_folder(self, folder_dir):
         for exercise in self.exercises:
-            name = exercise.get("name")
+            name = exercise.name
             if not name:
                 print(f"{Fore.RED}Error! No s'ha especificat la clau \"name\" en algun exercici.{Fore.RESET}")
                 exit(1)
 
             exercise_dir = f"{folder_dir}/{name}"
-            exercise.setdefault("tests",[]).extend(
-                    self.load_folder_tests(exercise_dir))
-        # utils.prettify_dict(self.exercises)
 
 
     # Load tests from a specific folder
@@ -83,6 +82,8 @@ class JavaJudge(BaseJudge):
         out = utils.run_or_exit(run_process, remove_command,
                 err=f"Error cleaning {self.out} directory").stdout
 
+        return self.result
+
     def build(self, name, java_package):
         # Build
         compile_command = (
@@ -102,7 +103,7 @@ class JavaJudge(BaseJudge):
 
         sources = []
         for source in matches:
-            source_file = f"{self.base_dir}/src/{source}.java"
+            source_file = f"{self.src_dir}/{source}.java"
             # print(source_file)
             sources.append(source_file)
         return sources
@@ -149,7 +150,7 @@ class JavaJudge(BaseJudge):
             print(f"{50 * '━'}")
             run_process_interactive(run_command)
         else:
-            for test in exercise.get("tests", []):
+            for test in exercise.tests:
                 self.run_test(test, run_command)
 
 
@@ -157,10 +158,10 @@ class JavaJudge(BaseJudge):
         utils.line_number_print(utils.highlight(source_content, "java"))
 
     def judge_exercise(self, exercise, interactive):
-        name = exercise.get("name")
+        name = exercise.name
 
         # If the exercise is located in a subpackage inside self.package
-        subpackage = exercise.get("subpackage", "")
+        subpackage = exercise.subpackage
         subpackage = "/".join([subpackage, name])
         source_path = f"{self.src_dir}/**/{self.package}/{subpackage}.java"
 
