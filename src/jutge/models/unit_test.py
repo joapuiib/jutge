@@ -1,3 +1,6 @@
+def str_or_none(_str):
+    return str(_str) if _str else None
+
 class UnitTest:
     def __init__(self, name, _dict={}):
         self.name = name
@@ -7,7 +10,8 @@ class UnitTest:
             _dict = {}
 
         self.source = _dict.get("source", None)
-        self.input = _dict.get("input", None)
+        self.input = str_or_none(_dict.get("input", None))
+
         self.expected_output = _dict.get("output", None)
         self.expected_stderr = _dict.get("stderr", None)
         self.force = _dict.get("force", False)

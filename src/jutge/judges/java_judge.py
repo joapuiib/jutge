@@ -7,13 +7,13 @@ from .. import utils
 from .base_judge import BaseJudge
 
 class JavaJudge(BaseJudge):
-    def __init__(self, base_dir, tests, args, src="src/main/java", out="out"):
+    def __init__(self, base_dir, tests, args):
         super().__init__(base_dir, tests, args)
 
         # Compilation folder (.class)
-        self.out = out
+        self.out = "out"
         # Source folder (.java)
-        self.src = src
+        self.src = args.src
         self.out_dir = f"{base_dir}/{self.out}"
         self.src_dir = f"{base_dir}/{self.src}"
 
@@ -61,9 +61,9 @@ class JavaJudge(BaseJudge):
                     if os.path.isfile(test_path):
                         data = utils.load_file(test_path)
                         if ext == ".in":
-                            test["input"] = data
+                            test.input = data
                         elif ext == ".out":
-                            test["output"] = data
+                            test.output = data
 
                 tests.append(test)
 
@@ -121,9 +121,9 @@ class JavaJudge(BaseJudge):
 
 
     def run_test(self, test, run_command):
-        expected_output = test["output"]
+        expected_output = test.expected_output
         expected_output += '\n'
-        test_input = test["input"]
+        test_input = test.input
         output = ""
         status = None
         try:
@@ -135,7 +135,7 @@ class JavaJudge(BaseJudge):
         except Exception:
             status = "RUNTIME"
         # output = run_process(run_command, stdin=test_input).stdout
-        self.print_test(test["name"], test_input, expected_output, output, status)
+        self.print_test(test.name, test_input, expected_output, output, status)
 
 
     def run_exercise(self, exercise, java_package, interactive):

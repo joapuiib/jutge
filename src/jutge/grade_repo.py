@@ -137,9 +137,14 @@ class Grade:
             print(f"Error! No s'ha trobat el judge: \"{judge_type}\"")
             exit(1)
 
-        judge = Judge(repo_dir, self.tests, self.args)
-        result_judge = judge.judge(interactive=interactive)
-        self.result = {**self.result, **result_judge}
+        try:
+            judge = Judge(repo_dir, self.tests, self.args)
+            result_judge = judge.judge(interactive=interactive)
+            self.result = {**self.result, **result_judge}
+        except Exception as ex:
+            if not disable_git:
+                run_or_exit(repo.git.checkout, "master" , out=f"Checkout master branch on exit...", err=f"Error checkout master")
+            raise ex
 
         self.copy_clipboard()
 
@@ -164,6 +169,7 @@ def main():
     parser.add_argument("--copy", action="store_true", default=False)
     parser.add_argument("--save", nargs="?", default=False)
     parser.add_argument("--light", action="store_true", default=False)
+    parser.add_argument("--src", nargs="?", default="src")
     args = parser.parse_args()
 
     grade = Grade(args)
