@@ -17,6 +17,8 @@ class JavaJudge(BaseJudge):
         self.out_dir = f"{base_dir}/{self.out}"
         self.src_dir = f"{base_dir}/{self.src}"
 
+        self.image = "openjdk:12"
+
         # If not specified, will read from root (src_dir)
         self.package = tests.get("package", "")
         self.package = "/".join(self.package.split("."))
@@ -77,7 +79,7 @@ class JavaJudge(BaseJudge):
         # Remove out/ folder
         remove_command = (
                 f"docker run --rm -v {os.getcwd()}/{self.base_dir}:/app"
-                f" -w /app -i openjdk:12 rm -r out/"
+                f" -w /app -i {self.image} rm -r out/"
         )
         out = utils.run_or_exit(run_process, remove_command,
                 err=f"Error cleaning {self.out} directory").stdout
@@ -88,7 +90,7 @@ class JavaJudge(BaseJudge):
         # Build
         compile_command = (
                 f"docker run --rm -v {os.getcwd()}/{self.base_dir}:/app"
-                f" -w /app -i openjdk:12 javac -verbose"
+                f" -w /app -i {self.image} javac -verbose"
                 f" -cp {self.out}/ -sourcepath {self.src}/"
                 f" -d {self.out}/ {self.src}/{java_package}.java"
         )
@@ -141,7 +143,7 @@ class JavaJudge(BaseJudge):
     def run_exercise(self, exercise, java_package, interactive):
         # Volumes
         volumes_options = " ".join([f"-v {os.getcwd()}/{self.base_dir}/{volume}:/app/{volume}" for volume in self.volumes])
-        run_command = f"docker run --rm -v {os.getcwd()}/{self.out_dir}:/app {volumes_options} -w /app -i openjdk:12 java {java_package}"
+        run_command = f"docker run --rm -v {os.getcwd()}/{self.out_dir}:/app {volumes_options} -w /app -i {self.image} java {java_package}"
         # print(run_command)
 
         if interactive:
