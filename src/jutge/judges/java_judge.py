@@ -17,7 +17,7 @@ class JavaJudge(BaseJudge):
         self.out_dir = f"{base_dir}/{self.out}"
         self.src_dir = f"{base_dir}/{self.src}"
 
-        self.image = "openjdk:12"
+        self.image = "openjdk:18"
 
         # If not specified, will read from root (src_dir)
         self.package = tests.get("package", "")
