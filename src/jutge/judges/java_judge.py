@@ -114,7 +114,7 @@ class JavaJudge(BaseJudge):
     def print_test(self, name, test_input, expected_output, output, status=None):
         colored_output, colored_expected_output, status = utils.colored_diff(output, expected_output, status)
         print("- test: {}".format(name))
-        if len(test_input) > 0:
+        if test_input:
             print("  input:")
             for line in test_input.splitlines():
                 print(Fore.CYAN + "    {}".format(line) + Fore.RESET)
@@ -134,8 +134,9 @@ class JavaJudge(BaseJudge):
                 status = "EMPTY"
         except TimeoutError:
             status = "TIMEOUT"
-        except Exception:
+        except Exception as ex:
             status = "RUNTIME"
+            print(ex)
         # output = run_process(run_command, stdin=test_input).stdout
         self.print_test(test.name, test_input, expected_output, output, status)
 
@@ -180,8 +181,9 @@ class JavaJudge(BaseJudge):
         java_package = source_file.split(f"{self.src}/")[1].replace(".java", "")
         try:
             sources = self.build(name, java_package)
-        except ExitCodeError:
-            print(f"{Fore.RED}Error compiling: {name}.java {Fore.RESET}")
+        except ExitCodeError as ex:
+            print(f"{Fore.RED}Error compiling: {name}.java{Fore.RESET}")
+            print(f"{Fore.RED}{ex}{Fore.RESET}")
             return
 
         # print(sources)
