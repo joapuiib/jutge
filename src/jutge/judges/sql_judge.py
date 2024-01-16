@@ -18,6 +18,7 @@ class SQLJudge(BaseJudge):
 
         # If not specified, will read from root (base_dir)
         self.package = tests.get("package", "")
+        self.database = tests.get("database", None)
         self.package = "/".join(self.package.split("."))
 
         # Docker image
@@ -122,6 +123,8 @@ class SQLJudge(BaseJudge):
         args = "-t --default-character-set=utf8"
         if force:
             args += " -f"
+        if self.database:
+            args += f" -D {self.database}"
 
         command = (f"docker exec -i {self.container}"
                    f" mysql -B -u{self.user} -p{self.password} {args}"
@@ -131,8 +134,12 @@ class SQLJudge(BaseJudge):
 
 
     def run_interactive(self):
+        args = "-t --default-character-set=utf8"
+        if self.database:
+            args += f" -D {self.database}"
+
         command = (f"docker exec -it {self.container}"
-                   f" mysql -u{self.user} -p{self.password} --silent -t --default-character-set=utf8"
+                   f" mysql -u{self.user} -p{self.password} --silent {args}"
         )
         run_process_interactive(command)
 
