@@ -18,8 +18,8 @@ class SQLJudge(BaseJudge):
 
         # If not specified, will read from root (base_dir)
         self.package = tests.get("package", "")
-        self.database = tests.get("database", None)
         self.package = "/".join(self.package.split("."))
+        self.database = tests.get("database", None)
 
         # Docker image
         self.image = "mariadb:10.8-rc"
@@ -29,6 +29,10 @@ class SQLJudge(BaseJudge):
 
         self.user = "root"
         self.password = "1234"
+
+        if self.database:
+            self.create_database_if_not_exists();
+
 
         self.init_scripts = tests.get("init", [])
         if not isinstance(self.init_scripts, list):
@@ -120,10 +124,13 @@ class SQLJudge(BaseJudge):
 
 
     def run_query(self, query, force=False, timeout=2):
+        return self.run_raw_query(query, force=force, timeout=timeout, database=self.database)
+
+    def run_raw_query(self, query, force=False, timeout=2, database=None):
         args = "-t --default-character-set=utf8"
         if force:
             args += " -f"
-        if self.database:
+        if database:
             args += f" -D {self.database}"
 
         command = (f"docker exec -i {self.container}"
@@ -131,6 +138,7 @@ class SQLJudge(BaseJudge):
         )
         # print(query)
         return run_process(command, stdin=query, timeout=timeout)
+
 
 
     def run_interactive(self):
@@ -142,6 +150,11 @@ class SQLJudge(BaseJudge):
                    f" mysql -u{self.user} -p{self.password} --silent {args}"
         )
         run_process_interactive(command)
+
+
+    def create_database_if_not_exists(self):
+        query = f"CREATE DATABASE IF NOT EXISTS {self.database};"
+        self.run_raw_query(query, force=True)
 
 
     def judge(self, interactive=False):
