@@ -70,6 +70,7 @@ class SQLJudge(BaseJudge):
                    f" -e MYSQL_ROOT_PASSWORD={self.password}"
                    f" --health-cmd=\'mysql -u{self.user} -p{self.password}\' --health-interval=2s"
                    f" {self.image}"
+                   " mysqld --lower_case_table_names=1"
         )
         out = utils.run_or_exit(run_process, command,
                 out=f"Init {self.image} {self.container} container...",
@@ -203,7 +204,7 @@ class SQLJudge(BaseJudge):
 
         # Print sources
         with open(source_file) as f:
-            exercise.source = f.read().strip()
+            exercise.source = f.read().strip().replace("\t", "    ")
             self.print_source(exercise.source)
             print()
             # result = self.run_exercise(name, exercise, source, interactive)
