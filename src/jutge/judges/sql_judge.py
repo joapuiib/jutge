@@ -30,10 +30,6 @@ class SQLJudge(BaseJudge):
         self.user = "root"
         self.password = "1234"
 
-        if self.database:
-            self.create_database_if_not_exists();
-
-
         self.init_scripts = tests.get("init", [])
         if not isinstance(self.init_scripts, list):
             self.init_scripts = [self.init_scripts]
@@ -160,6 +156,9 @@ class SQLJudge(BaseJudge):
     def judge(self, interactive=False):
         if len(self.exercises) > 0:
             self.init_container()
+
+            if self.database:
+                self.create_database_if_not_exists();
 
             utils.run_or_exit(self.run_init_scripts,
                 out=f"Running init scirpts...",
