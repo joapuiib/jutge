@@ -185,20 +185,25 @@ class SQLJudge(BaseJudge):
             print(f"{Fore.RED}Error! No s'ha especificat la clau \"name\" en algun exercici.{Fore.RESET}")
             raise Exception("No class name specified")
 
-        source_path = re.sub(r"/+", "/", f"{self.base_dir}/{self.package}/{exercise.subpackage}/{name}.sql")
+        dir_path = f"{self.base_dir}/{self.package}/{exercise.subpackage}"
+        dir_path = re.sub(r"[/]+", "/", dir_path)
+        dir_path = re.sub(r"[/]+$", "", dir_path)
 
         print("=" * 20)
         print(name)
-        print(source_path)
 
-        source_file = next(iter(glob(source_path, recursive=True)), None)
+        source_file = next((os.path.join(root, file)
+                            for root, _, files in os.walk(dir_path)
+                            for file in files if re.match(r"[_]?" + name + r".sql", file)
+                            ) , None)
         if not source_file:
             print(f"{Fore.RED}{name}: Not found{Fore.RESET}")
             exercise.result["found"] = False
-            exercise.result["source_file"] = source_path
+            exercise.result["source_file"] = source_file
             print(f"{Fore.RED}Error! No script found{Fore.RESET}")
             return exercise.result
 
+        print(source_file)
         exercise.result["found"] = True
         exercise.result["source_file"] = source_file
 
