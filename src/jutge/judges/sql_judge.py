@@ -194,7 +194,7 @@ class SQLJudge(BaseJudge):
 
         source_file = next((os.path.join(root, file)
                             for root, _, files in os.walk(dir_path)
-                            for file in files if re.match(r"[_]?" + name + r".sql", file)
+                            for file in files if re.match(r"[_]?" + name + r".sql", file, re.IGNORECASE)
                             ) , None)
         if not source_file:
             print(f"{Fore.RED}{name}: Not found{Fore.RESET}")
