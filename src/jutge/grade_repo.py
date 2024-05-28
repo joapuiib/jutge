@@ -4,10 +4,11 @@ import yaml
 import os
 from colorama import Fore
 from datetime import datetime
-import sys
+# import sys
 import git
 from jutge.judges.java_judge import JavaJudge
 from jutge.judges.sql_judge import SQLJudge
+from jutge.judges.mongodb_judge import MongoDBJudge
 from jutge.utils import run_or_exit, prettify_dict, load_file, copy_clipboard
 import jutge.utils as utils
 
@@ -32,6 +33,7 @@ class Grade:
         self.available_judges = {}
         self.available_judges["java"] = JavaJudge
         self.available_judges["sql"] = SQLJudge
+        self.available_judges["mongodb"] = MongoDBJudge
 
 
     def find_and_load_yaml_files(self, tests, tests_dir):
